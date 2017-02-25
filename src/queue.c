@@ -164,6 +164,46 @@ int put(struct queue* queue, void* info)
 	return 0;
 }
 
+int sortput(struct queue* queue, void* info, int (*comp)(void*, void*))
+{
+	struct node* current;
+	struct node* nnode;
+
+	if(queue == NULL)
+	{
+		return -1;
+	}
+	else if(queue->head == NULL)
+	{
+		nnode = makeNode(info);
+		if(nnode == NULL)
+		{
+			return -1;
+		}
+
+		queue->head = nnode;
+		return 0;
+	}
+
+	current = getHead(queue);
+
+	while(getNext(current) != NULL)
+	{
+		if(comp(info, getData(getNext(current))) >= 0)
+		{
+			nnode = makeNode(info);
+			nnode->next = getNext(current);
+			current->next = nnode;
+			return 0;
+		}
+
+		current = getNext(current);
+	}
+	put(queue, info);
+
+	return 0;
+}
+
 void* get(struct queue* queue)
 {
 	void* data;
@@ -185,4 +225,20 @@ void* get(struct queue* queue)
 	free(temp);
 
 	return data;
+}
+
+void printqueue(struct queue* queue, void (*print)(void*))
+{
+	struct node* current;
+
+	current = getHead(queue);
+
+	while(current != NULL)
+	{
+		print(getData(current));
+
+		current = getNext(current);
+	}
+
+	return;
 }

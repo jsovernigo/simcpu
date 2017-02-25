@@ -1,7 +1,13 @@
-
-#include "parse.h"
+/**
+ *	Julian Sovernigo	0948924
+ *	gsoverni@mail.uoguelph.ca
+ *	CIS*3110_W17
+ */
 #include "queue.h"
+#include "parse.h"
 #include "processes.h"
+#include "fcfs.h"
+#include <stdlib.h>
 #include <stdio.h>
 
 void print(void* v)
@@ -30,29 +36,32 @@ int compare(void* v1, void* v2)
 	return t2->atime - t1->atime;
 }
 
-int main()
+int main(int argc, char** argv)
 {
 	int i;
-	int ts;
+	int threadc;
 	int pdelay;
 	int tdelay;
+
 	struct thread** threads;
 	struct queue* threadqueue;
 
 	threadqueue = makeQueue();
 
-	threads = readFile(&ts, &pdelay, &tdelay);
+	threads = readFile(&threadc, &pdelay, &tdelay);
 	if(threads == NULL)
 	{
 		return 1;
 	}
 
-	for(i = 0; i < ts; i++)
+	for(i = 0; i < threadc; i++)
 	{
 		sortput(threadqueue, (void*) threads[i], &compare);
 	}
 
 	printqueue(threadqueue, &print);
+
+	fcfs(threadqueue, 1, 1);
 
 	return 0;
 }

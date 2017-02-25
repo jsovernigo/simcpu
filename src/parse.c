@@ -11,40 +11,44 @@
 #include <stdlib.h>
 
 
-struct process** readFile(int* nRead)
+struct thread** readFile(int* nRead, int* processdelay, int* threaddelay)
 {
 	int i;
 	int pNum;
 	int pdelay;
 	int tdelay;
+	int threads;
+	int cthread;
 
 	char buffer[128];
-	struct process** pread;
+	struct thread** tread;
 
 	fgets(buffer, 128, stdin);
 	sscanf(buffer ,"%d %d %d", &pNum, &pdelay, &tdelay);
-	*nRead = pNum;
 
-	pread = malloc(sizeof(struct process) * pNum);
-	if(pread == NULL)
-	{
-		return NULL;
-	}
+	*processdelay = pdelay;
+	*threaddelay = tdelay;
 
+	threads = 0;
+	cthread = 0;
+
+	tread = malloc(sizeof(struct thread));
+	
+	/* repeat for every process outlined above */
 	for(i = 0; i < pNum; i++)
 	{
 		int j;
 		int pid;
 		int threadc;
 
-		struct process* cp;
-		struct thread** tread;
-
+		/* capture pid and thread count for this process. */
 		fgets(buffer, 128, stdin);
 		sscanf(buffer, "%d %d", &pid, &threadc);
+		threads += threadc;
 
-		tread = malloc(sizeof(struct thread) * threadc);
+		tread = realloc(tread, sizeof(struct thread) * threads);
 
+		/* for every thread in this process */
 		for(j = 0; j < threadc; j++)
 		{
 			int k;
@@ -66,6 +70,10 @@ struct process** readFile(int* nRead)
 				int cputime;
 				int iotime;
 
+				iotime = 0;
+				cputime = 0;
+				bid = 0;
+
 				struct burst* cb;
 
 				fgets(buffer, 128, stdin);
@@ -76,12 +84,12 @@ struct process** readFile(int* nRead)
 			}
 
 			ct = makeThread(pid, tid, burstc, atime, bread);
-			tread[j] = ct;
+			tread[cthread] = ct;
+			cthread ++;
 		}
-		
-		cp = makeProcess(pid, threadc, tread);
-		pread[i] = cp;
 	}
 
-	return pread;
+	*nRead = threads;
+
+	return tread;
 }

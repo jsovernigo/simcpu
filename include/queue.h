@@ -50,6 +50,16 @@ int put(struct queue* queue, void* info);
 /**
  *
  */
+int sortput(struct queue* queue, void* info, int (*comp)(void*, void*));
+
+/**
+ *
+ */
 void* get(struct queue* queue);
+
+/**
+ *
+ */
+void printqueue(struct queue* queue, void (*print)(void*));
 
 #endif

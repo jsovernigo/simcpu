@@ -10,7 +10,6 @@
 
 #include "processes.h"
 
-struct process** readFile(int* nRead);
-
+struct thread** readFile(int* nRead, int* pdelay, int* tdelay);
 
 #endif

@@ -10,14 +10,6 @@
 #ifndef	__GSOVERNIGO_PROCESSES_H__
 #define __GSOVERNIGO_PROCESSES_H__
 
-struct process
-{
-	int pid;
-	int threadc;
-
-	struct thread** threads;
-};
-
 struct thread
 {
 	int pid;
@@ -34,11 +26,6 @@ struct burst
 	int iotime;
 	int cputime;
 };
-
-/**
- *
- */
-struct process* makeProcess(int pid, int threadc, struct thread** threads);
 
 /**
  *

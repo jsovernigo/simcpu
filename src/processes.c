@@ -11,23 +11,6 @@
 #include "processes.h"
 #include <stdlib.h>
 
-struct process* makeProcess(int pid, int threadc, struct thread** threads)
-{
-	struct process* newProcess;
-
-	newProcess = malloc(sizeof(struct process));
-	if(newProcess == NULL)
-	{
-		return NULL;
-	}
-
-	newProcess->pid = pid;
-	newProcess->threadc = threadc;
-	newProcess->threads = threads;
-
-	return newProcess;
-}
-
 struct thread* makeThread(int pid, int tid, int burstc, int atime, struct burst** bursts)
 {
 	struct thread* newThread;
