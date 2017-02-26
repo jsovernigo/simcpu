@@ -10,6 +10,16 @@
 
 #include "processes.h"
 
+/**
+ *	readFile
+ *	reads the file that is passed through stdin
+ *	IN:			nRead			- the numer of items read.
+ *				pdelay			- the process delay
+ *				tdelay			- the thread delay
+ *	OUT:		an array of threads.
+ *	POST:		all passed in pointers are changed.
+ *	ERROR:		any pointers passed in are null.
+ */
 struct thread** readFile(int* nRead, int* pdelay, int* tdelay);
 
 #endif

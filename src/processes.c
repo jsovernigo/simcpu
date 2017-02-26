@@ -46,3 +46,45 @@ struct burst* makeBurst(int bid, int iotime, int cputime)
 
 	return newBurst;
 }
+
+struct cthread* makeCThread(struct thread* endthread, int stime, int iotime, int ttime, int endtime)
+{
+	struct cthread* finishedThread;
+
+	finishedThread = malloc(sizeof(struct cthread));
+	if(finishedThread == NULL)
+	{
+		return NULL;
+	}
+
+	finishedThread->ct = endthread;
+	finishedThread->stime = stime;
+	finishedThread->iotime = iotime;
+	finishedThread->ttime = ttime;
+	finishedThread->endtime = endtime;
+
+	return finishedThread;
+}
+
+int burstDone(struct burst* burst)
+{
+	if(burst->iotime == 0 && burst->cputime == 0)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+int threadDone(struct thread* thread)
+{
+	int i;
+
+	for(i = 0; i < thread->burstc; i++)
+	{
+		if(!burstDone(thread->bursts[i]))
+		{
+			return 0;
+		}
+	}
+	return 1;
+}

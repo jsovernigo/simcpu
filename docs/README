@@ -1,8 +1,8 @@
 *************************************************
 Julian Sovernigo            0948924
 gsoverni@mail.uoguelph.ca
-CIS3110_W17                 A1: basic shell
-1/30/2017
+CIS3110_W17                 A1: thread scheduler
+2/27/2017
 *************************************************
 
 ******************
@@ -28,16 +28,11 @@ Running the program
 ********************
 
 1- cd to the root folder of the program
-2- use ./jsh to run it
-3- the proram is a shell, unix commands are used.
-
-****
-???
-****
-
-Command:		multiplication
-Inputs:			0x12, 10, 15, etc.
-Outputs:		the product of the (numeric) arguments given.
+2- use ./simcpu to run it
+3- flags:
+	[-d]			- runs in detailed mode
+	[-v]			- runs in verbose mode
+	[-r][<quantum>]	- runs in round robin mode, quantum must be supplied.
 
 ********************
 Program Description
@@ -45,41 +40,32 @@ Program Description
 
 	The program's algorith follows the following proceedure:
 
-	First, the program enters a do-while loop; essentially, the loop waits
-until a valid quit command has been entered.  The loop then prompts the user
-with a traditional ~$ for a command.  Upon receiving a command, the arguments
-will be checked for special characters, like the &, or an in/out redirect.
-Once all of these things have been checked, and the final arguments are constructed
-(special terms and file names are removed...), we fork, and pass off execution to
-the child process.
+	The sceduler operates in two different modes, fcfs, and RR.  In FCFS mode,
+the threads are first read in and placed into a "future events" queue.  These
+are then read, one by one, with time-ties being resolved using a "file-original-
+order" method.  In otherwords, if two threads arrive at the same time, then the
+one specified first in the file is the one placed in the ready queue first. The
+threads are read into the ready queue, with each one being given a blank com-
+pletion record, which is updated as the simulation continues.  In Round Robin
+mode, the events are similarly read into a queue fo future events, then trans-
+ferred into the ready queue when the arrive, but this time, instead of events
+bing given a blank completion record and being allowed to run until completion,
+the thread runs until the quantum expires, and is then stores its record, a new
+thread is loaded, and its record is retreived or created.  The final records,
+printed using the -d flag, are given in the order they arrive in at the scheduler
+(again, another queue is used, simply to preserve ordering.)
 
-	The child process will examine the actual arguments further, and will first
-check wether the any streams were redirected, and then handle them in the child 
-process.  Next, the commands are checked if they are shell-implimented, or a 
-predefined one that is handled by the OS.  If it is shell implimented, the shell
-will send the args over to the function associated with it in the driver.c file.
-If the command is NOT a shell-implimented one, then the commands themselves are
-sent off to the OS through the use of the execvp() function call.  Once the OS
-returns (or we are done executing our own commands), the child process will exit.
+	While running the simulation, several types of overhead are expressed:
 
-	In the parent process, the forked pid is added to an array of pids that are
-kept in order to prevent zombie-creation later.  Once the pid is recorded, the 
-program will determine if nowait has been set, indicating a background process.
-If nowait is set to zero, however, this indicates a foreground process, so we
-need to wait for the process to finish.  This is done using the waitpid command,
-which allows us to limit our waiting to the single process that we forked in the
-forground.
+	When first beginning the run, overhead is added when loading a starting thread.
+It is assumed that this thead is the most distant possible, and so accounts for
+thread AND process context switch on the initial load.  When switching to a thread
+of the same process, the scheduler adds the thread delay to the "busy" counter,
+which is counted down until the process can begin execution.  When switching to
+a thread in a different process, both the thread and process delays are added
+to the busy counter, since we are transitioning between both types of boundaries.
 
-	If the fork() call returns an invalid pid, which would represent a failed 
-fork attempt, then a message is printed to the screen to alert the user, but the 
-shell will continue to execute.
-
-	Finally, once the user has entered the quit command, the program will exit
-from the main body loop that was used to get user commands (and for for their
-subsequent execution). Outside the main loop, a cleanup process will loop through
-the stored pid we have been keeping track of this whole time, and send a SIGTERM
-command to each of them, so that they do not keep executing in the background if
-they did not have a finite stop condition, or are depending on some other event.
-But, because the OS guarantees non-reuse of PIDs, there is no need for checking
-the status or ownership of the pids that are executing. Upon cleaning up the 
-processes in the background, the program finally returns 0.
+	Note however, that since a thread is NOT unloaded and reloaded when the ready
+queue is empty, that the delay is not registered here, because the thread is never
+actually taken out of running mode.  Also, no overhead is associated with time
+slice interrupts, and as such should not be expected in the output.

@@ -1,6 +1,6 @@
 CFLAGS		=-Wall -ansi -g
 TFLAGS		=-Wall -Wextra -Werror -ansi -pedantic -g
-OBJECTS		=queue.o processes.o parse.o fcfs.o
+OBJECTS		=queue.o processes.o parse.o exec.o
 
 all: build
 
@@ -9,7 +9,7 @@ all: build
 #
 #
 build: $(OBJECTS)
-	gcc $(CFLAGS) bin/queue.o bin/processes.o bin/parse.o bin/fcfs.o src/simcpu.c -o simcpu -I./include
+	gcc $(CFLAGS) bin/queue.o bin/processes.o bin/parse.o bin/exec.o src/simcpu.c -o simcpu -I./include
 
 setup: bin/
 	mkdir bin
@@ -27,8 +27,8 @@ parse.o: src/parse.c include/parse.h processes.o
 processes.o: src/processes.c include/processes.h
 	gcc $(CFLAGS) src/processes.c -c -o bin/processes.o -I./include
 
-fcfs.o: src/fcfs.c include/fcfs.h
-	gcc $(CFLAGS) src/fcfs.c -c -o bin/fcfs.o -I./include
+exec.o: src/exec.c include/exec.h
+	gcc $(CFLAGS) src/exec.c -c -o bin/exec.o -I./include
 
 #
 #	Test rules

@@ -9,6 +9,7 @@
 #include "parse.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 struct thread** readFile(int* nRead, int* processdelay, int* threaddelay)
@@ -23,8 +24,19 @@ struct thread** readFile(int* nRead, int* processdelay, int* threaddelay)
 	char buffer[128];
 	struct thread** tread;
 
-	fgets(buffer, 128, stdin);
-	sscanf(buffer ,"%d %d %d", &pNum, &pdelay, &tdelay);
+	pNum = 0;
+
+	buffer[0] = '\0';
+
+	if(fgets(buffer, 128, stdin) == NULL)
+	{
+		return NULL;
+	}
+	if(strlen(buffer) <= 0)
+	{
+		return NULL;
+	}
+	sscanf(buffer ,"%d %d %d", &pNum, &tdelay, &pdelay);
 
 	*processdelay = pdelay;
 	*threaddelay = tdelay;
@@ -77,7 +89,15 @@ struct thread** readFile(int* nRead, int* processdelay, int* threaddelay)
 				struct burst* cb;
 
 				fgets(buffer, 128, stdin);
-				sscanf(buffer, "%d %d %d", &bid, &cputime, &iotime);
+				if(k < burstc - 1)
+				{
+					sscanf(buffer, "%d %d %d", &bid, &cputime, &iotime);
+				}
+				else
+				{
+					sscanf(buffer, "%d %d", &bid, &cputime);
+					iotime = 0;
+				}
 
 				cb = makeBurst(bid, iotime, cputime);
 				bread[k] = cb;
